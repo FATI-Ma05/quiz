@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Produit ou humain intellectuel ?</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--wine:#4b1718;--wine2:#702626;--gold:#e6c98e;--cream:#fff7e8;--muted:#d9c9ad;--ink:#321416}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#7a3030,#351112 70%);color:var(--cream);font-family:Georgia,serif;min-height:100vh}
+.wrap{max-width:850px;margin:auto;padding:22px 16px 50px}.panel{background:rgba(43,12,13,.82);border:1px solid #c5a66d;border-radius:20px;padding:24px;box-shadow:0 12px 35px #17060788}
+h1,h2{color:var(--gold);text-align:center;margin-top:0}h1{font-size:clamp(1.7rem,5vw,2.7rem);letter-spacing:.04em}h2{font-size:1.45rem}
+.sub{text-align:center;color:var(--muted);line-height:1.5}.ornament{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:20px 0}
+button{border:1px solid var(--gold);background:var(--gold);color:#351112;border-radius:12px;padding:13px 18px;font-weight:bold;font-size:1rem;cursor:pointer}
+button.secondary{background:transparent;color:var(--gold)}button:disabled{opacity:.45;cursor:not-allowed}
+.center{text-align:center}.hidden{display:none!important}.small{font-size:.9rem;color:var(--muted)}.topline{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.9rem}
+.progress{height:8px;background:#2b0c0d;border-radius:10px;overflow:hidden;margin:14px 0 24px}.bar{height:100%;background:var(--gold);width:0;transition:width .25s}
+.choice{display:block;width:100%;text-align:left;margin:12px 0;background:#5c2021;color:var(--cream);border:1px solid #b48c55;padding:17px;border-radius:13px;line-height:1.4}
+.choice.selected{background:#8a5a2a;border-color:#ffe0a1;color:white}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.stat{padding:18px;border:1px solid #a88752;border-radius:14px;background:#541d1b;text-align:center}
+.big{font-size:2rem;color:var(--gold);font-weight:bold}.meter{height:14px;background:#2b0c0d;border-radius:10px;overflow:hidden;display:flex;margin:8px 0}.meter span:first-child{background:#c49a56}.meter span:last-child{background:#d8c18d}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #b99a64;background:#fff8ec;color:#2c1111;margin:8px 0}
+#qrcode{display:inline-block;background:white;padding:12px;border-radius:10px;margin:10px}
+footer{text-align:center;color:#cbb995;font-size:.8rem;margin-top:18px}
+@media(max-width:560px){.panel{padding:18px}.statgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <div id="home">
+      <h1>PRODUIT OU HUMAIN INTELLECTUEL ?</h1>
+      <p class="sub">Un jeu pour réfléchir à l'influence de la société, de la culture et de la publicité sur notre identité personnelle.</p>
+      <div class="ornament"></div>
+      <p class="center">Répondez à 10 questions et découvrez votre tendance.</p>
+      <p class="small center">Ce questionnaire est une activité de réflexion, pas un test scientifique ni une mesure de l'intelligence.</p>
+      <div class="center row"><button id="startBtn">Commencer le jeu</button><button class="secondary" id="resultsBtn">Voir les résultats de la classe</button></div>
+    </div>
+
+    <div id="quiz" class="hidden">
+      <div class="topline"><span id="qnum">Question 1/10</span><span id="answered">0 réponse</span></div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <h2 id="question"></h2>
+      <div id="choices"></div>
+      <div class="row"><button class="secondary" id="backBtn">Précédent</button><button id="nextBtn" disabled>Suivant</button></div>
+    </div>
+
+    <div id="done" class="hidden center">
+      <h2>Merci pour votre participation !</h2>
+      <p id="personalResult"></p>
+      <p class="small">Votre réponse anonyme a été prise en compte dans les statistiques collectives.</p>
+      <div class="row"><button id="classBtn">Voir les résultats de la classe</button><button class="secondary" id="againBtn">Recommencer</button></div>
+    </div>
+
+    <div id="results" class="hidden">
+      <h2>Résultats de la classe</h2>
+      <p class="sub" id="total">Chargement des réponses...</p>
+      <div class="statgrid">
+        <div class="stat"><div class="big" id="pctA">—%</div><strong>Profil influencé par la consommation</strong></div>
+        <div class="stat"><div class="big" id="pctB">—%</div><strong>Profil autonome et réflexif</strong></div>
+      </div>
+      <div class="meter"><span id="meterA" style="width:50%"></span><span id="meterB" style="width:50%"></span></div>
+      <p class="small center">Les pourcentages représentent la tendance dominante des réponses, pas la valeur ou l'intelligence des participants.</p>
+      <p class="small center" id="updated"></p>
+      <div class="row"><button id="refreshBtn">Actualiser</button><button class="secondary" id="backHomeBtn">Accueil</button></div>
+    </div>
+
+    <div class="ornament"></div>
+    <div id="teacher">
+      <h2 style="font-size:1.1rem">Espace organisateur</h2>
+      <p class="small center">Pour activer les statistiques partagées, collez l'URL de votre application Google Apps Script ci-dessous. Cette étape est à faire par l'organisateur.</p>
+      <input id="apiUrl" placeholder="URL de l'application Web Apps Script (https://script.google.com/macros/s/...)">
+      <div class="row"><button class="secondary" id="saveUrl">Enregistrer l'URL</button><button class="secondary" id="qrBtn">Afficher le QR Code</button></div>
+      <div class="center"><div id="qrcode"></div><p class="small" id="qrHelp">Le QR Code sera créé à partir de l'adresse publique du jeu une fois celui-ci hébergé.</p></div>
+      <p class="small">Pour un vrai jeu collectif, hébergez ce fichier sur un site HTTPS et configurez Apps Script avec le guide fourni.</p>
+    </div>
+  </div>
+  <footer>Exposé : La construction de l'identité personnelle</footer>
+</div>
+<script>
+const DEFAULT_API_URL = ""; // Collez ici l’URL /exec Apps Script AVANT de publier le site.
+const questions=[
+["Quand une nouvelle tendance apparaît sur les réseaux sociaux, tu…",["La suis rapidement pour ne pas être à l'écart.","Je regarde si elle me correspond avant de décider."]],
+["Avant d'acheter un article à la mode, tu…",["Penses surtout à la marque et à ce qu'elle représente.","Vérifies d'abord si tu en as besoin et s'il te plaît vraiment."]],
+["Si tes amis défendent une opinion différente de la tienne…",["Tu préfères souvent être d'accord avec eux.","Tu exprimes ton avis avec respect et des arguments."]],
+["Une publicité te présente un produit comme indispensable. Tu…",["As facilement envie de l'acheter.","Te demandes si le produit est réellement utile."]],
+["Pour toi, réussir dans la vie signifie surtout…",["Montrer une belle image et posséder des choses appréciées.","Développer ses capacités, ses valeurs et réaliser ses projets."]],
+["Quand tu vois une personne très populaire en ligne, tu…",["As tendance à vouloir lui ressembler.","Gardes du recul : sa vie en ligne ne montre pas tout."]],
+["Une tradition de ton entourage ne correspond pas à tes convictions. Tu…",["La suis surtout pour éviter le jugement.","Essaies de comprendre son sens et de réfléchir à ton propre choix."]],
+["Pour choisir tes vêtements, tu privilégies…",["Ce qui est tendance et valorisé par les autres.","Ce qui correspond à tes goûts et à ton confort."]],
+["Face à une information partagée par beaucoup de personnes, tu…",["La crois facilement si elle est populaire.","Cherches à vérifier sa fiabilité et son contexte."]],
+["Qu'est-ce qui influence le plus l'image que tu as de toi-même ?",["Le regard des autres et leur reconnaissance.","Tes valeurs, tes expériences et la connaissance de toi-même."]]
+];
+let answers=Array(10).fill(null),idx=0,sessionId="";
+const $=id=>document.getElementById(id);
+function show(id){["home","quiz","done","results"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function render(){
+ $("qnum").textContent=`Question ${idx+1}/10`; $("answered").textContent=`${answers.filter(x=>x!==null).length} réponse(s)`;
+ $("bar").style.width=`${(idx+1)*10}%`; $("question").textContent=questions[idx][0]; $("choices").innerHTML="";
+ questions[idx][1].forEach((v,j)=>{let b=document.createElement("button");b.className="choice"+(answers[idx]===j?" selected":"");b.textContent=(j===0?"A. ":"B. ")+v;b.onclick=()=>{answers[idx]=j;render();};$("choices").appendChild(b);});
+ $("backBtn").disabled=idx===0;$("nextBtn").disabled=answers[idx]===null;$("nextBtn").textContent=idx===9?"Terminer":"Suivant";
+}
+function api(){return $("apiUrl").value.trim()||localStorage.getItem("classGameApi")||DEFAULT_API_URL;}
+async function sendVote(a,b){
+ const url=api(); if(!url){return {ok:false,local:true};}
+ const u=new URL(url);u.searchParams.set("action","vote");u.searchParams.set("a",a);u.searchParams.set("b",b);u.searchParams.set("id",sessionId);
+ await fetch(u.toString(),{mode:"no-cors"});return {ok:true};
+}
+function start(){answers=Array(10).fill(null);idx=0;sessionId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random());show("quiz");render();}
+async function finish(){
+ const a=answers.filter(x=>x===0).length,b=answers.filter(x=>x===1).length;
+ const profile=b>=a?"Profil autonome et réflexif":"Profil influencé par la consommation";
+ $("personalResult").textContent=`Votre tendance : ${profile} (${Math.max(a,b)}/10 réponses).`;
+ show("done");
+ try{await sendVote(a,b);}catch(e){alert("Impossible de contacter le serveur. Vérifiez l'URL Apps Script. Vous pouvez tout de même utiliser le jeu en mode démonstration.");}
+}
+function jsonp(url){
+ return new Promise((resolve,reject)=>{let cb="cb_"+Math.random().toString(36).slice(2);let s=document.createElement("script");let timer=setTimeout(()=>{cleanup();reject(new Error("timeout"));},8000);
+ function cleanup(){clearTimeout(timer);delete window[cb];s.remove();}
+ window[cb]=d=>{cleanup();resolve(d)};s.onerror=()=>{cleanup();reject(new Error("network"));};
+ s.src=url+(url.includes("?")?"&":"?")+"action=stats&callback="+cb;document.body.appendChild(s);});
+}
+async function loadResults(){
+ show("results");
+ try{
+  if(!api())throw new Error("no api");
+  let d=await jsonp(api());
+  let n=Number(d.total||0),a=Number(d.a||0),b=Number(d.b||0),sum=a+b||1,pa=Math.round(a/sum*100),pb=100-pa;
+  $("total").textContent=`${n} participant(s)`;
+  $("pctA").textContent=pa+"%";$("pctB").textContent=pb+"%";
+  $("meterA").style.width=pa+"%";$("meterB").style.width=pb+"%";
+  $("updated").textContent="Mis à jour à l'instant.";
+ }catch(e){$("total").textContent="Statistiques non disponibles : configurez l'URL Apps Script et réessayez.";$("pctA").textContent="—%";$("pctB").textContent="—%";}
+}
+$("startBtn").onclick=start;$("resultsBtn").onclick=loadResults;$("backBtn").onclick=()=>{if(idx>0){idx--;render();}};
+$("nextBtn").onclick=()=>{if(idx<9){idx++;render();}else finish();};
+$("classBtn").onclick=loadResults;$("againBtn").onclick=()=>show("home");$("refreshBtn").onclick=loadResults;$("backHomeBtn").onclick=()=>show("home");
+$("saveUrl").onclick=()=>{let v=$("apiUrl").value.trim();localStorage.setItem("classGameApi",v);alert("URL enregistrée sur cet appareil.");};
+$("qrBtn").onclick=()=>{let link=location.href.split("#")[0];$("qrcode").innerHTML="";if(!link.startsWith("http")){$("qrHelp").textContent="Hébergez d'abord le jeu sur une adresse HTTPS publique, puis ouvrez cette adresse et créez le QR Code.";return;}new QRCode($("qrcode"),{text:link,width:180,height:180,colorDark:"#351112",colorLight:"#ffffff"});$("qrHelp").textContent="Scannez ce code pour ouvrir le jeu.";};
+let saved=localStorage.getItem("classGameApi");if(saved)$("apiUrl").value=saved;
+</script>
+</body></html>
